@@ -1,9 +1,13 @@
 # Crafting Interpreters
 This repository contains my solutions of the exercises of the [Crafting Interpreters](https://craftinginterpreters.com/) book.
 
-## Additional resources:
+## Complementary material:
 * [Chomsky hierarchy](https://en.wikipedia.org/wiki/Chomsky_hierarchy)
 * [Compilers: Principles, Techniques, and Tools (the Dragon Book)](https://www.amazon.com/Compilers-Principles-Techniques-Tools-2nd/dp/0321486811)
+
+## Reading list
+* [A Lisp/Clojure book](https://en.wikipedia.org/wiki/Clojure)
+
 
 ## Challenges
 ### Chapter 2
