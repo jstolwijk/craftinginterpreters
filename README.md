@@ -1,6 +1,14 @@
 # Crafting Interpreters
 This repository contains my solutions of the exercises of the [Crafting Interpreters](https://craftinginterpreters.com/) book.
 
+## Complementary material:
+* [Chomsky hierarchy](https://en.wikipedia.org/wiki/Chomsky_hierarchy)
+* [Compilers: Principles, Techniques, and Tools (the Dragon Book)](https://www.amazon.com/Compilers-Principles-Techniques-Tools-2nd/dp/0321486811)
+
+## Reading list
+* [A Lisp/Clojure book](https://en.wikipedia.org/wiki/Clojure)
+
+
 ## Challenges
 ### Chapter 2
 
@@ -22,3 +30,5 @@ The type is unknown at compile time, the compiler has to know the type to be abl
 3. Most Lisp implementations that compile to C also contain an interpreter that lets them execute Lisp code on the fly as well. Why?
 
 Lisp allows you to [evaluate code at compile time](https://www.gnu.org/software/emacs/manual/html_node/elisp/Eval-During-Compile.html). 
+
+
