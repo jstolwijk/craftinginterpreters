@@ -1,5 +1,5 @@
-# craftinginterpreters
-Crafting Interpreters book
+# Crafting Interpreters
+This repository contains my solutions of the exercises of the [Crafting Interpreters](https://craftinginterpreters.com/) book.
 
 ## Challenges
 ### Chapter 2
