@@ -1,6 +1,4 @@
 import TokenType.*
-import jdk.nashorn.internal.objects.NativeRegExp.source
-
 
 class Scanner {
     private var start = 0
@@ -61,11 +59,38 @@ class Scanner {
             '=' -> if (nextCharIs('=')) EQUAL_EQUAL to null else EQUAL to null
             '<' -> if (nextCharIs('=')) LESS_EQUAL to null else LESS to null
             '>' -> if (nextCharIs('=')) GREATER_EQUAL to null else GREATER to null
-            '/' -> if (nextCharIs('/')) {
-                takeUnless { equals('\n') || isAtEnd }
-                null to null
-            } else {
-                SLASH to null
+            '/' -> when {
+                nextCharIs('/') -> {
+                    takeUnless { it == '\n' || isAtEnd }
+                    null to null
+                }
+                nextCharIs('*') -> {
+                    var nesting = 1
+                    while(nesting > 0) {
+                        when {
+                            isAtEnd -> return Result.Error(
+                                line = line,
+                                where = "",
+                                message = "Unterminated comment block."
+                            )
+                            peek() == '/' && peekNext() == '*' -> {
+                                advance()
+                                advance()
+                                nesting ++
+                            }
+                            peek() == '*' && peekNext() == '/' -> {
+                                advance()
+                                advance()
+                                nesting --
+                            }
+                            else -> advance()
+                        }
+                    }
+                    null to null
+                }
+                else -> {
+                    SLASH to null
+                }
             }
             ' ', '\r', '\t' -> null to null
             '\n' -> (null to null).also { line++ }
@@ -95,8 +120,6 @@ class Scanner {
             }
         }
 
-        TODO IMPLEMENT CHALLENGES CHAPTER 4
-        https://craftinginterpreters.com/scanning.html
         return tokenType?.let {
             Result.Success(
                 Token(
@@ -119,26 +142,23 @@ class Scanner {
         get() = this in ('0'..'9')
 
     private fun String.getIdentifierTokenType(): TokenType {
-        takeWhile { isAlphaNumeric }
+        takeWhile { it.isAlphaNumeric }
 
         return keywords[substring(start, current)] ?: IDENTIFIER
     }
 
     private fun String.getNumber(): Double {
-        takeWhile { isDigit }
+        takeWhile { it.isDigit }
 
         if (peek() == '.' && peekNext().isDigit) {
             advance()
-            takeWhile { isDigit }
+            takeWhile { it.isDigit }
         }
         return substring(start, current).toDouble()
     }
 
     private fun String.getString(): String? {
-        while (peek() != '"' && !isAtEnd) {
-            if (peek() == '\n') line++
-            advance()
-        }
+        takeWhile { it != '"' && !isAtEnd }
 
         if (isAtEnd) {
             return null
@@ -165,12 +185,15 @@ class Scanner {
         return true
     }
 
-    private fun String.takeUnless(predicate: Char.() -> Boolean) {
-        takeWhile { !predicate(this) }
+    private fun String.takeUnless(predicate: (Char) -> Boolean) {
+        takeWhile { !predicate(it) }
     }
 
-    private fun String.takeWhile(predicate: Char.() -> Boolean) {
-        while (predicate(peek())) advance()
+    private fun String.takeWhile(predicate: (Char) -> Boolean) {
+        while (predicate(peek())) {
+            if(peek() == '\n') line ++
+            advance()
+        }
     }
 
     private fun advance() = run { current++ }
