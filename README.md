@@ -32,6 +32,11 @@ The type is unknown at compile time, the compiler has to know the type to be abl
 Lisp allows you to [evaluate code at compile time](https://www.gnu.org/software/emacs/manual/html_node/elisp/Eval-During-Compile.html). 
 
 ### Chapter 5
+#### 1.
+
+#### 2. Visitor pattern in functional languages
+My current implementation in kotlin is using pattern matching to walk over visit the expression object's children. I think something similar can be done in haskell.
+
 #### 3. Reverse polish notation
 ```
 fun main() {
@@ -51,10 +56,9 @@ fun main() {
         ).toReversePolishNotation()
     )
 }
-
 fun Expression.toReversePolishNotation(): String {
     return when(this) {
-        is Binary -> format(operator.lexeme, left, right)
+        is Binary -> "${left.toReversePolishNotation()} ${right.toReversePolishNotation()} ${operator.lexeme}"
         is Literal -> when(this) {
             is LiteralNumber -> value.stripTrailingZeros().toString()
             is LiteralString -> value
@@ -62,13 +66,8 @@ fun Expression.toReversePolishNotation(): String {
             is False -> "false"
             is Nil -> "nil"
         }
-        is Grouping ->  expression.toReversePolishNotation()
-        is Unary -> format(operator.lexeme, right)
+        is Grouping -> expression.toReversePolishNotation()
+        is Unary -> "${right.toReversePolishNotation()} ${operator.lexeme}"
     }
-}
-
-private fun format(name: String, vararg expressions: Expression): String {
-    val items = expressions.map { it.toReversePolishNotation() } + listOf(name)
-    return items.joinToString(prefix = "", postfix = "", separator = " ")
 }
 ```
