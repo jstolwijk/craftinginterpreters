@@ -31,4 +31,44 @@ The type is unknown at compile time, the compiler has to know the type to be abl
 
 Lisp allows you to [evaluate code at compile time](https://www.gnu.org/software/emacs/manual/html_node/elisp/Eval-During-Compile.html). 
 
+### Chapter 5
+#### 3. Reverse polish notation
+```
+fun main() {
+    println(
+        Binary(
+            left = Grouping(Binary(
+                left = LiteralNumber(BigDecimal("1")),
+                operator = Token(TokenType.PLUS, "+", null, 1),
+                right = LiteralNumber(BigDecimal("2"))
+            )),
+            operator = Token(TokenType.STAR, "*", null, 1),
+            right = Grouping(Binary(
+                left = LiteralNumber(BigDecimal("4")),
+                operator = Token(TokenType.MINUS, "-", null, 1),
+                right = LiteralNumber(BigDecimal("3"))
+            ))
+        ).toReversePolishNotation()
+    )
+}
 
+fun Expression.toReversePolishNotation(): String {
+    return when(this) {
+        is Binary -> format(operator.lexeme, left, right)
+        is Literal -> when(this) {
+            is LiteralNumber -> value.stripTrailingZeros().toString()
+            is LiteralString -> value
+            is True -> "true"
+            is False -> "false"
+            is Nil -> "nil"
+        }
+        is Grouping ->  expression.toReversePolishNotation()
+        is Unary -> format(operator.lexeme, right)
+    }
+}
+
+private fun format(name: String, vararg expressions: Expression): String {
+    val items = expressions.map { it.toReversePolishNotation() } + listOf(name)
+    return items.joinToString(prefix = "", postfix = "", separator = " ")
+}
+```
