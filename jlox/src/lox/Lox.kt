@@ -1,3 +1,5 @@
+package lox
+
 import java.io.File
 import kotlin.system.exitProcess
 

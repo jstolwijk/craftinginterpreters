@@ -1,4 +1,6 @@
-import TokenType.*
+package lox
+
+import lox.TokenType.*
 
 class Scanner {
     private var start = 0
@@ -19,7 +21,7 @@ class Scanner {
         "if" to IF,
         "nil" to NIL,
         "or" to OR,
-        "print" to PRINT,
+        "lox.print" to PRINT,
         "return" to RETURN,
         "super" to SUPER,
         "this" to THIS,
