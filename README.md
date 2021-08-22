@@ -71,3 +71,5 @@ fun Expression.toReversePolishNotation(): String {
     }
 }
 ```
+
+### Chapter 6

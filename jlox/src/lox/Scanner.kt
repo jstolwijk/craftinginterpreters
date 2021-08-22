@@ -1,6 +1,7 @@
 package lox
 
 import lox.TokenType.*
+import java.math.BigDecimal
 
 class Scanner {
     private var start = 0
@@ -149,14 +150,14 @@ class Scanner {
         return keywords[substring(start, current)] ?: IDENTIFIER
     }
 
-    private fun String.getNumber(): Double {
+    private fun String.getNumber(): BigDecimal {
         takeWhile { it.isDigit }
 
         if (peek() == '.' && peekNext().isDigit) {
             advance()
             takeWhile { it.isDigit }
         }
-        return substring(start, current).toDouble()
+        return substring(start, current).toBigDecimal()
     }
 
     private fun String.getString(): String? {

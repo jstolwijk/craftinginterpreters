@@ -1,5 +1,6 @@
 package lox
 
+import grammar_generator.toPrettyString
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -16,31 +17,34 @@ fun runPrompt() {
         print("> ")
         val result = run(readLine()!!)
 
-        if(result is Result.Error) {
-            result.print()
+        val errors = result.filterIsInstance<Result.Error<Token>>()
+
+        if(errors.isEmpty()) {
+            println(Parser(result.filterIsInstance<Result.Success<Token>>().map { it.value }).parse()?.toPrettyString())
+        } else {
+            errors.first().print()
         }
     }
 }
 
 fun runFile(filePath: String) {
     val result = run(File(filePath).readText())
-
-    if(result is Result.Error) {
-        result.print()
-        exitProcess(65)
-    }
+    result.filterIsInstance<Result.Error<Token>>()
+        .first {
+            it.print()
+            exitProcess(65)
+        }
 }
 
-fun run(source: String): Result<String> {
+fun run(source: String): List<Result<Token>> {
     val tokens = Scanner().scan(source)
 
     tokens.map {
         println(it)
     }
 
-    return Result.Success("ok")
+    return tokens
 }
-
 
 sealed class Result<T> {
     data class Success<T>(val value: T): Result<T>()
