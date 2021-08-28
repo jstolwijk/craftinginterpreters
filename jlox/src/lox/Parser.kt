@@ -2,6 +2,7 @@ package lox
 
 import grammar_generator.Expr
 import grammar_generator.Expr.Binary
+import grammar_generator.Stmt
 import lox.TokenType.*
 import java.math.BigDecimal
 
@@ -9,12 +10,33 @@ import java.math.BigDecimal
 class Parser(private var tokens: List<Token>) {
     private var currentIndex = 0
 
-    fun parse(): Expr? {
-        return try {
-            expression()
-        } catch (error: ParserError) {
-            println(error)
-            null
+    fun parse(): List<Stmt> {
+        return mutableListOf<Stmt>().also {
+            try {
+                while (!isAtEnd()) {
+                    it.add(statement())
+                }
+            } catch (error: ParserError) {
+                println(error)
+            }
+        }
+    }
+
+    private fun statement(): Stmt {
+        if(match(PRINT)) return printStatement()
+
+        return expressionStatement()
+    }
+
+    private fun printStatement(): Stmt {
+        return Stmt.Print(expression()).also {
+            consumeOrError(SEMICOLON, "Expect ';' after value.")
+        }
+    }
+
+    private fun expressionStatement(): Stmt {
+        return Stmt.Expression(expression()).also {
+            consumeOrError(SEMICOLON, "Expect ';' after expression.")
         }
     }
 

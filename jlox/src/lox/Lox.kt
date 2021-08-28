@@ -1,9 +1,6 @@
 package lox
 
-import grammar_generator.interpret
-import grammar_generator.toPrettyString
 import java.io.File
-import java.math.BigDecimal
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -22,18 +19,9 @@ fun runPrompt() {
         val errors = result.filterIsInstance<Result.Error<Token>>()
 
         if(errors.isEmpty()) {
-            val expr = Parser(result.filterIsInstance<Result.Success<Token>>().map { it.value }).parse()
-            println(expr)
+            val statements = Parser(result.filterIsInstance<Result.Success<Token>>().map { it.value }).parse()
 
-            val prettyOutput: String = when(val output = expr?.interpret()) {
-                is BigDecimal -> output.toString()
-                is String -> "\"$output\""
-                is Boolean -> output.toString()
-                null -> "nil"
-                else -> ""
-            }
-
-            println(prettyOutput)
+            interpret(statements)
         } else {
             errors.first().print()
         }

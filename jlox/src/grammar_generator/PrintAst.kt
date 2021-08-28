@@ -8,51 +8,6 @@ import java.math.BigDecimal
 import java.math.MathContext
 
 
-fun Expr.interpret(): Any? {
-    return when(this) {
-        is Binary -> {
-            val left = left.interpret()
-            val right = right.interpret()
-            return when {
-                operator.type == TokenType.GREATER -> left as BigDecimal > right as BigDecimal
-                operator.type == TokenType.GREATER_EQUAL -> left as BigDecimal >= right as BigDecimal
-                operator.type == TokenType.LESS -> (left as BigDecimal) < (right as BigDecimal)
-                operator.type == TokenType.LESS_EQUAL -> left as BigDecimal <= right as BigDecimal
-                operator.type == TokenType.MINUS -> left as BigDecimal - right as BigDecimal
-                operator.type == TokenType.PLUS && left is BigDecimal && right is BigDecimal -> left + right
-                operator.type == TokenType.PLUS && left is String && right is String -> left + right
-                operator.type == TokenType.SLASH -> (left as BigDecimal).divide(right as BigDecimal, MathContext.DECIMAL128)
-                operator.type == TokenType.STAR -> (left as BigDecimal).multiply(right as BigDecimal, MathContext.DECIMAL128)
-                operator.type == TokenType.EQUAL_EQUAL -> isEqual(left, right)
-                operator.type == TokenType.BANG_EQUAL -> !isEqual(left, right)
-                else -> null
-            }
-        }
-        is Literal -> when(this) {
-            is LiteralNumber -> value
-            is LiteralString -> value
-            is True -> true
-            is False -> false
-            is Nil -> null
-        }
-        is Grouping -> expr.interpret()
-        is Unary -> when(operator.type) {
-            TokenType.BANG -> !isTruthy(right.interpret())
-            TokenType.MINUS -> -(right.interpret() as BigDecimal)
-            else -> null
-        }
-    }
-}
-
-private fun isEqual(a: Any?, b: Any?): Boolean {
-    if (a == null && b == null) return true
-    return if (a == null) false else a == b
-}
-private fun isTruthy(`object`: Any?): Boolean {
-    if (`object` == null) return false
-    return if (`object` is Boolean) `object` else true
-}
-
 fun Expr.toPrettyString(): String {
     return when(this) {
         is Binary -> "(${operator.lexeme} ${left.toPrettyString()} ${right.toPrettyString()})"

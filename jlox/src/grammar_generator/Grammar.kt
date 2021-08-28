@@ -8,7 +8,7 @@ sealed class Stmt {
     data class Print(val expr: Expr) : Stmt()
 }
 
-sealed class Expr: Stmt() {
+sealed class Expr {
     sealed class Literal : Expr() {
         data class LiteralNumber(val value: BigDecimal) : Literal()
         data class LiteralString(val value: String) : Literal()
