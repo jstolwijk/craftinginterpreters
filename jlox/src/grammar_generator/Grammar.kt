@@ -3,8 +3,13 @@ package grammar_generator
 import lox.Token
 import java.math.BigDecimal
 
-sealed class Expression {
-    sealed class Literal : Expression() {
+sealed class Stmt {
+    data class Expression(val expr: Expr): Stmt()
+    data class Print(val expr: Expr) : Stmt()
+}
+
+sealed class Expr: Stmt() {
+    sealed class Literal : Expr() {
         data class LiteralNumber(val value: BigDecimal) : Literal()
         data class LiteralString(val value: String) : Literal()
         object True : Literal()
@@ -12,13 +17,13 @@ sealed class Expression {
         object Nil : Literal()
     }
 
-    data class Unary(val operator: Token, val right: Expression) : Expression()
+    data class Unary(val operator: Token, val right: Expr) : Expr()
 
     data class Binary(
-        val left: Expression,
+        val left: Expr,
         val operator: Token,
-        val right: Expression
-    ) : Expression()
+        val right: Expr
+    ) : Expr()
 
-    data class Grouping(val expression: Expression) : Expression()
+    data class Grouping(val expr: Expr) : Expr()
 }

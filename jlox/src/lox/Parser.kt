@@ -1,7 +1,7 @@
 package lox
 
-import grammar_generator.Expression
-import grammar_generator.Expression.Binary
+import grammar_generator.Expr
+import grammar_generator.Expr.Binary
 import lox.TokenType.*
 import java.math.BigDecimal
 
@@ -9,7 +9,7 @@ import java.math.BigDecimal
 class Parser(private var tokens: List<Token>) {
     private var currentIndex = 0
 
-    fun parse(): Expression? {
+    fun parse(): Expr? {
         return try {
             expression()
         } catch (error: ParserError) {
@@ -18,12 +18,12 @@ class Parser(private var tokens: List<Token>) {
         }
     }
 
-    private fun expression(): Expression {
+    private fun expression(): Expr {
         return equality()
     }
 
-    private fun equality(): Expression {
-        var expr: Expression = comparison()
+    private fun equality(): Expr {
+        var expr: Expr = comparison()
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
             val operator: Token = previous()
             val right = comparison()
@@ -32,8 +32,8 @@ class Parser(private var tokens: List<Token>) {
         return expr
     }
 
-    private fun comparison(): Expression {
-        var expr: Expression = term()
+    private fun comparison(): Expr {
+        var expr: Expr = term()
 
         while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
             val operator: Token = previous()
@@ -43,7 +43,7 @@ class Parser(private var tokens: List<Token>) {
         return expr
     }
 
-    private fun term(): Expression {
+    private fun term(): Expr {
         var expr = factor()
         while (match(MINUS, PLUS)) {
             val operator = previous()
@@ -53,7 +53,7 @@ class Parser(private var tokens: List<Token>) {
         return expr
     }
 
-    private fun factor(): Expression {
+    private fun factor(): Expr {
         var expr = unary()
         while (match(SLASH, STAR)) {
             val operator = previous()
@@ -63,23 +63,23 @@ class Parser(private var tokens: List<Token>) {
         return expr
     }
 
-    private fun unary(): Expression {
+    private fun unary(): Expr {
         return if (match(BANG, MINUS)) {
             val operator = previous()
             val right = unary()
-            Expression.Unary(operator, right)
+            Expr.Unary(operator, right)
         } else {
             primary()
         }
     }
 
-    private fun primary(): Expression {
+    private fun primary(): Expr {
         return when {
-            match(FALSE) -> Expression.Literal.False
-            match(TRUE) -> Expression.Literal.True
-            match(NIL) -> Expression.Literal.Nil
-            match(NUMBER) -> Expression.Literal.LiteralNumber(previous().literal as? BigDecimal ?: handleError(previous(),"Literal '${previous().literal}' is not a number"))
-            match(STRING) -> Expression.Literal.LiteralString(previous().literal as? String ?: handleError(previous(),"Literal '${previous().literal}' is not a string"))
+            match(FALSE) -> Expr.Literal.False
+            match(TRUE) -> Expr.Literal.True
+            match(NIL) -> Expr.Literal.Nil
+            match(NUMBER) -> Expr.Literal.LiteralNumber(previous().literal as? BigDecimal ?: handleError(previous(),"Literal '${previous().literal}' is not a number"))
+            match(STRING) -> Expr.Literal.LiteralString(previous().literal as? String ?: handleError(previous(),"Literal '${previous().literal}' is not a string"))
             match(LEFT_PAREN) -> {
                 val expr = expression()
 
@@ -88,7 +88,7 @@ class Parser(private var tokens: List<Token>) {
                     errorMessage = "Expect ')' after expression."
                 )
 
-                return Expression.Grouping(expr)
+                return Expr.Grouping(expr)
             }
             else -> handleError(peek(), "Expected expression")
         }

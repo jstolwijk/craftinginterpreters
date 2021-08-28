@@ -1,14 +1,14 @@
 package grammar_generator
 
-import grammar_generator.Expression.*
-import grammar_generator.Expression.Literal.*
+import grammar_generator.Expr.*
+import grammar_generator.Expr.Literal.*
 import lox.Token
 import lox.TokenType
 import java.math.BigDecimal
 import java.math.MathContext
 
 
-fun Expression.interpret(): Any? {
+fun Expr.interpret(): Any? {
     return when(this) {
         is Binary -> {
             val left = left.interpret()
@@ -35,7 +35,7 @@ fun Expression.interpret(): Any? {
             is False -> false
             is Nil -> null
         }
-        is Grouping -> expression.interpret()
+        is Grouping -> expr.interpret()
         is Unary -> when(operator.type) {
             TokenType.BANG -> !isTruthy(right.interpret())
             TokenType.MINUS -> -(right.interpret() as BigDecimal)
@@ -53,7 +53,7 @@ private fun isTruthy(`object`: Any?): Boolean {
     return if (`object` is Boolean) `object` else true
 }
 
-fun Expression.toPrettyString(): String {
+fun Expr.toPrettyString(): String {
     return when(this) {
         is Binary -> "(${operator.lexeme} ${left.toPrettyString()} ${right.toPrettyString()})"
         is Literal -> when(this) {
@@ -63,12 +63,12 @@ fun Expression.toPrettyString(): String {
             is False -> "false"
             is Nil -> "nil"
         }
-        is Grouping ->  "(group ${expression.toPrettyString()})"
+        is Grouping ->  "(group ${expr.toPrettyString()})"
         is Unary -> "(${operator.lexeme} ${right.toPrettyString()})"
     }
 }
 
-fun Expression.toReversePolishNotation(): String {
+fun Expr.toReversePolishNotation(): String {
     return when(this) {
         is Binary -> "${left.toReversePolishNotation()} ${right.toReversePolishNotation()} ${operator.lexeme}"
         is Literal -> when(this) {
@@ -78,7 +78,7 @@ fun Expression.toReversePolishNotation(): String {
             is False -> "false"
             is Nil -> "nil"
         }
-        is Grouping -> expression.toReversePolishNotation()
+        is Grouping -> expr.toReversePolishNotation()
         is Unary -> "${right.toReversePolishNotation()} ${operator.lexeme}"
     }
 }
