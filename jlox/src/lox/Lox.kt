@@ -3,12 +3,38 @@ package lox
 import java.io.File
 import kotlin.system.exitProcess
 
+
 fun main(args: Array<String>) {
     when {
         args.size > 1 -> println("Usage: jlox [script]").also { exitProcess(64) }
         args.size == 1 -> runFile(args.single())
         else -> runPrompt()
     }
+//    val result = run("""
+//        var a = "global a";
+//        var b = "global b";
+//        var c = "global c";
+//        {
+//          var a = "outer a";
+//          var b = "outer b";
+//          {
+//            var a = "inner a";
+//            print a;
+//            print b;
+//            print c;
+//          }
+//          print a;
+//          print b;
+//          print c;
+//        }
+//        print a;
+//        print b;
+//        print c;
+//    """.trimIndent())
+//
+//    val statements = Parser(result.filterIsInstance<Result.Success<Token>>().map { it.value }).parse()
+//
+//    interpret(statements)
 }
 
 fun runPrompt() {
@@ -38,13 +64,7 @@ fun runFile(filePath: String) {
 }
 
 fun run(source: String): List<Result<Token>> {
-    val tokens = Scanner().scan(source)
-
-    tokens.map {
-        println(it)
-    }
-
-    return tokens
+    return Scanner().scan(source)
 }
 
 sealed class Result<T> {
